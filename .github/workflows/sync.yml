@@ -1,9 +1,12 @@
-name: Sync posts from Repo A
+name: Sync posts
 
 on:
-  workflow_dispatch:  # 支持手动触发
+  workflow_dispatch:
   schedule:
-    - cron: '0 1 * * *'  # 每天凌晨 1 点自动同步（UTC）
+    - cron: '0 1 * * *'
+
+permissions:
+  contents: write
 
 jobs:
   sync:
@@ -11,6 +14,8 @@ jobs:
     steps:
       - name: Checkout B repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # 用系统提供的 token
 
       - name: Clone A repository (_posts)
         run: |
