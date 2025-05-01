@@ -5,7 +5,7 @@ categories:
 tags:
   - 投稿
   - 文庙校区
-math: true
+mathjax: true
 ---
 
 # 1-比赛
