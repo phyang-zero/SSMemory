@@ -19,22 +19,31 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 2. 克隆 A 仓库 (_posts)
+      # 2. 克隆 A 仓库 (_posts)，完整历史以获取真实提交时间
       - name: Clone A repository (_posts)
         run: |
-          git clone --depth=1 https://x-access-token:${{ secrets.TOKEN }}@github.com/SSMemory/ssmemory.github.io.git repo-a
+          git clone https://x-access-token:${{ secrets.TOKEN }}@github.com/SSMemory/ssmemory.github.io.git repo-a
 
-      # 3. 只同步新增和更新内容，保留 B 中的其它文件
+      # 3. 用每个文件的最后提交时间修正 mtime
+      - name: Normalize timestamps to commit time
+        run: |
+          cd repo-a
+          find _posts -type f | while read file; do
+            # 获取该文件最后一次提交的 UNIX 时间戳
+            ts=$(git log -1 --format="%at" -- "$file")
+            # 如果能拿到时间戳，就设置文件 mtime
+            if [ -n "$ts" ]; then
+              touch -d "@$ts" "$file"
+            fi
+          done
+          cd ..
+
+      # 4. 同步：新增和更新，保留 B 的独有或更新品
       - name: Sync updated and new posts
         run: |
-          # 用 rsync 同步：
-          # -a：归档模式（保留权限、时间戳等）  
-          # --update：只覆盖那些源比目标新的文件，不删除目标多余文件
           rsync -a --update repo-a/_posts/ _posts/
-
-          # 提交并推送
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
           git add _posts
-          git commit -m "同步 _posts：仅新增&更新内容" || echo "无变更，无需提交"
+          git commit -m "同步 _posts：仅新增 & 更新内容" || echo "无变更，无需提交"
           git push
