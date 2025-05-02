@@ -3,31 +3,38 @@ name: Sync posts
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 1 * * *'    # 每天 UTC 1 点运行
 
 permissions:
-  contents: write
+  contents: write         # 允许推送修改
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. 检出 B 仓库
       - name: Checkout B repository
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # 用系统提供的 token
+          token: ${{ secrets.GITHUB_TOKEN }}
 
+      # 2. 克隆 A 仓库 (_posts)
       - name: Clone A repository (_posts)
         run: |
           git clone --depth=1 https://x-access-token:${{ secrets.TOKEN }}@github.com/SSMemory/ssmemory.github.io.git repo-a
 
-      - name: Replace _posts from A
+      # 3. 只同步新增和更新内容，保留 B 中的其它文件
+      - name: Sync updated and new posts
         run: |
-          rm -rf _posts
-          mkdir -p _posts
-          cp -r repo-a/_posts/* _posts/
+          # 用 rsync 同步：
+          # -a：归档模式（保留权限、时间戳等）  
+          # --update：只覆盖那些源比目标新的文件，不删除目标多余文件
+          rsync -a --update repo-a/_posts/ _posts/
+
+          # 提交并推送
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
           git add _posts
-          git commit -m "同步 _posts 从 SSMemory 仓库" || echo "无变更，无需提交"
+          git commit -m "同步 _posts：仅新增&更新内容" || echo "无变更，无需提交"
           git push
