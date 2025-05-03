@@ -1,49 +1,60 @@
 name: Sync posts
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:                # 手动触发
   schedule:
-    - cron: '0 1 * * *'    # 每天 UTC 1 点运行
+    - cron: "0 4 * * *"             # 每天 UTC 04:00 = 北京/新加坡 12:00
 
 permissions:
-  contents: write         # 允许推送修改
+  contents: write                   # 允许写入代码
 
 jobs:
   sync:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 检出 B 仓库
-      - name: Checkout B repository
+      # 1. 检出当前仓库 (B)
+      - name: Checkout target repository (B)
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0            # 保留历史，方便后续比较
           token: ${{ secrets.TOKEN }}
 
-      # 2. 克隆 A 仓库 (_posts)，完整历史以获取真实提交时间
-      - name: Clone A repository (_posts)
+      # 2. 保险起见，把 origin remote 改成 PAT（有时 checkout 不会自动替换）
+      - name: Set remote URL to use PAT
         run: |
-          git clone https://x-access-token:${{ secrets.TOKEN }}@github.com/SSMemory/ssmemory.github.io.git repo-a
+          git remote set-url origin https://x-access-token:${{ secrets.TOKEN }}@github.com/${{ github.repository }}.git
 
-      # 3. 用每个文件的最后提交时间修正 mtime
+      # 3. 克隆源仓库 (A: SSMemory/ssmemory.github.io)
+      - name: Clone source repository (_posts)
+        run: |
+          git clone --filter=blob:none \
+            https://x-access-token:${{ secrets.TOKEN }}@github.com/SSMemory/ssmemory.github.io.git repo-a
+
+      # 4. 以每个文件最后一次提交时间修正 mtime
       - name: Normalize timestamps to commit time
         run: |
           cd repo-a
-          find _posts -type f | while read file; do
-            # 获取该文件最后一次提交的 UNIX 时间戳
-            ts=$(git log -1 --format="%at" -- "$file")
-            # 如果能拿到时间戳，就设置文件 mtime
-            if [ -n "$ts" ]; then
-              touch -d "@$ts" "$file"
-            fi
+          find _posts -type f -print0 | while IFS= read -r -d '' file; do
+            ts=$(git log -1 --format='%at' -- "$file")
+            [ -n "$ts" ] && touch -m -d "@$ts" "$file"
           done
           cd ..
 
-      # 4. 同步：新增和更新，保留 B 的独有或更新品
+      # 5. 同步新增 / 更新的文章
       - name: Sync updated and new posts
         run: |
           rsync -a --update repo-a/_posts/ _posts/
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
+
+          git config --global user.name  "GitHub Action"
+          git config --global user.email "action@github.com"
           git add _posts
-          git commit -m "同步 _posts：仅新增 & 更新内容" || echo "无变更，无需提交"
-          git push
+
+          # 若无变更则直接退出，避免空 push
+          if git diff --cached --quiet; then
+            echo "No changes detected — skip commit & push."
+            exit 0
+          fi
+
+          git commit -m "chore(sync): update _posts at $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          git push origin HEAD
