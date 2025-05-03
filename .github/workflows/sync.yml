@@ -17,7 +17,7 @@ jobs:
       - name: Checkout B repository
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.TOKEN }}
 
       # 2. 克隆 A 仓库 (_posts)，完整历史以获取真实提交时间
       - name: Clone A repository (_posts)
