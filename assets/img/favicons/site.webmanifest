@@ -1,0 +1,27 @@
+---
+layout: null
+permalink: /site.webmanifest
+---
+{
+  "name": "锦水文澜",
+  "short_name": "SSMemory",
+  "icons": [
+    {
+      "src": "{{ '/assets/img/favicons/web-app-manifest-192x192.png' | relative_url }}",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "{{ '/assets/img/favicons/web-app-manifest-512x512.png' | relative_url }}",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "start_url": "{{ '/' | relative_url }}",
+  "scope": "{{ '/' | relative_url }}",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff"
+}
