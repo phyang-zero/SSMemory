@@ -7,15 +7,15 @@ platforms:
     link: "https://service.weibo.com/share/share.php?title=TITLE&url=URL"
     noblank: true
 
-  - type: QQ
-    icon: "fab fa-qq"
-    link: "https://connect.qq.com/widget/shareqq/index.html?url=URL&title=TITLE&desc=&summary=&site="
-    noblank: true
+  # - type: QQ
+  #   icon: "fab fa-qq"
+  #   link: "https://connect.qq.com/widget/shareqq/index.html?url=URL&title=TITLE&desc=&summary=&site="
+  #   noblank: true
 
-  - type: QZone
-    icon: "fab fa-qzone"
-    link: "https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=URL&title=TITLE"
-    noblank: true
+  # - type: QZone
+  #   icon: "fab fa-qzone"
+  #   link: "https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=URL&title=TITLE"
+  #   noblank: true
 
   # - type: WeChat
   #   icon: "fab fa-weixin"
