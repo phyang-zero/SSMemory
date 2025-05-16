@@ -17,8 +17,8 @@ platforms:
     link: "https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=URL&title=TITLE"
     noblank: true
 
-  - type: WeChat
-    icon: "fab fa-weixin"
-    # 微信要用二维码方式分享，这里用第三方生成：
-    qr: "https://api.qrserver.com/v1/create-qr-code/?data=URL&size=150x150"
-    tip: "扫码分享到微信"
+  # - type: WeChat
+  #   icon: "fab fa-weixin"
+  #   # 微信要用二维码方式分享，这里用第三方生成：
+  #   qr: "https://api.qrserver.com/v1/create-qr-code/?data=URL&size=150x150"
+  #   tip: "扫码分享到微信"
