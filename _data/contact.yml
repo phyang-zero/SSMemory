@@ -3,6 +3,14 @@
 - type: github
   icon: "fab fa-github"
 
+- type: QQ
+  icon: "fab fa-fw fa-qq"
+  url: 'https://qm.qq.com/q/7wQlWZaCz0'
+
+- type: Email
+  icon: "fas fa-fw fa-envelope"
+  url: "mailto:peterharris1878@gmail.com"
+
 # - type: twitter
 #   icon: "fa-brands fa-x-twitter"
 
