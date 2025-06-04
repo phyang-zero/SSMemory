@@ -1,0 +1,20 @@
+---
+---
+
+/* prettier-ignore */
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
+
+/* append your custom style below */
+
+.post-subtitle {
+  margin-top: 0.25em;
+  margin-bottom: 1em;
+  font-size: 1rem;
+  color: var(--site-text-muted);
+  font-weight: 400;
+  line-height: 1.4;
+}
